@@ -1,6 +1,6 @@
-%w(version table request collection).each do |script|
-  require "rdatatables/#{script}"
+module RDataTables
 end
 
-module RDataTables
+%w(version core).each do |script|
+  require_relative "rdatatables/#{script}"
 end
