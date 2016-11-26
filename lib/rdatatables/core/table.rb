@@ -1,6 +1,6 @@
 module RDataTables
   module Core
-    class Table
+    module Table
       DuplicateColumn = Class.new(Exception)
 
       def self.included(base)
