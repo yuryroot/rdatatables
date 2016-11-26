@@ -1,6 +1,6 @@
 module RDataTables
   module Core
-    module Table
+    class Table
       DuplicateColumn = Class.new(Exception)
 
       def self.included(base)
@@ -29,7 +29,7 @@ module RDataTables
         initialize_table(*args)
       end
 
-      def initialize_table(collection: [], request_params: {}, context: nil)
+      def initialize_table(collection:, request_params: {}, context: nil)
         @request = Request.new(table: self, params: request_params)
         @collection = Collection.new(table: self, collection: collection, request: @request)
         @context = context

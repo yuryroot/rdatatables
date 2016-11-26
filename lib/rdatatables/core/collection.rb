@@ -14,35 +14,69 @@ module RDataTables
         paginate
       end
 
-      def filter
-        call_overridden_or_block(__method__, @collection, @request)
+      def data_rows
+        @collection.map { |object| data_row(object) }
       end
 
-      def sort
-        call_overridden_or_block(__method__, @collection, @request) do
-          return if @request.sorting_columns.empty?
+      def data_row(object)
+        @table.class.columns.keys.map { |column| data_cell(object, column) }
+      end
 
-          sorting_columns.each do |column, direction|
-            sort_by(column, direction)
+      def data_cell(object, column)
+        call_overridden_or_block(column, object) do
+          _data_cell(object, column)
+        end
+      end
+
+      def filter
+        @collection = begin
+          call_overridden_or_block(__method__, @collection, @request) do
+            _filter
           end
         end
       end
 
+      def sort
+        @collection = begin
+          call_overridden_or_block(__method__, @collection, @request) do
+            next @collection if @request.sorting_columns.empty?
+
+            sorting_columns.each do |column, direction|
+              sort_by(column, direction)
+            end
+          end
+        end  
+      end
+
       def sort_by(column, direction)
-        call_overridden_or_block(__method__, column, direction) do
-          sort_method = "sort_by_#{column}"
-          
-          if overridden?(sort_method)
-            @table.send(sort_method, column, direction)
+        @collection = begin
+          call_overridden_or_block(__method__, @collection, column, direction) do
+            sort_method = "sort_by_#{column}"
+            
+            if overridden?(sort_method)
+              @table.send(sort_method, @collection, column, direction)
+            else
+              _sort_by(column, direction)
+            end
           end
         end
       end
 
       def paginate
-        call_overridden_or_block(__method__, @collection, @request)
+        @Collection = begin
+          call_overridden_or_block(__method__, @collection, @request) do
+            _paginate
+          end
+        end
       end
 
       protected
+
+      %w(_data_cell _filter _sort_by _paginate).each do |method|
+        define_method(method) do
+          raise NotImplementedError, method
+        end
+      end
 
       def overridden?(method)
         @table.respond_to?(method)
@@ -51,7 +85,7 @@ module RDataTables
       def call_overridden_or_block(method, *params, &block)
         if overridden?(method)
           @table.send(method, *params)
-        else
+        else  
           block.call if block_given?
         end
       end
