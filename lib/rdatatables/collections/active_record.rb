@@ -2,6 +2,10 @@ module RDataTables
   module Collections
     class ActiveRecord < RDataTables::Core::Collection
 
+      def self.processable?(collection)
+        defined?(::ActiveRecord) && collection.is_a?(::ActiveRecord::Relation)
+      end
+
       def _data_cell(object, column)
         object.send(column)
       end

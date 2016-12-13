@@ -1,8 +1,10 @@
-module RDataTables
-  module Core
-  end
+%w(table request collection exceptions).each do |script|
+  require_relative "core/#{script}"
 end
 
-%w(table request collection).each do |script|
-  require_relative "core/#{script}"
+module RDataTables
+  include Core::Exceptions
+
+  module Core
+  end
 end

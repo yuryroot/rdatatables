@@ -8,6 +8,10 @@ module RDataTables
         @request = request
       end
 
+      def self.processable?(collection)
+        false
+      end
+
       def process
         filter
         sort

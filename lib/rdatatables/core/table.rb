@@ -1,8 +1,6 @@
 module RDataTables
   module Core
     module Table
-      DuplicateColumn = Class.new(Exception)
-
       def self.included(base)
         base.extend(ClassMethods)
       end
@@ -18,7 +16,7 @@ module RDataTables
 
         def column(name, options = {})
           if columns.key?(name)
-            raise DuplicateColumn, name
+            raise(RDataTables::DuplicateColumn, name)
           end
 
           columns[name] = options
@@ -31,8 +29,10 @@ module RDataTables
 
       def initialize_table(collection:, request_params: {}, context: nil)
         @request = Request.new(table: self, params: request_params)
-        @collection = Collection.new(table: self, collection: collection, request: @request)
         @context = context
+
+        collection_adapter = Collections.adapter_for(collection)
+        @collection = collection_adapter.new(table: self, collection: collection, request: @request)
       end
     end
   end
