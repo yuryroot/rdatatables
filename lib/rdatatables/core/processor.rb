@@ -5,7 +5,7 @@ module RDataTables
       def initialize(table:, collection:, request:)
         @table = table
         @collection = collection
-        @collection_adapter = CollectionAdapter.adapter_for(collection)
+        @collection_adapter = CollectionAdapters.adapter_for(collection)
         @request = request
       end
 
@@ -13,6 +13,17 @@ module RDataTables
         filter
         sort
         paginate
+      end
+
+      def data_hash
+        {
+          sEcho:                @request.echo,
+          # TODO: Set total & total display counters to correct values
+          #       #filter method must also be implemented.
+          iTotalRecords:        @collection.count,
+          iTotalDisplayRecords: @collection.count,
+          aaData:               data_rows
+        }
       end
 
       def data_rows
@@ -32,7 +43,7 @@ module RDataTables
       def filter
         @collection = begin
           call_overridden_or_block(__method__, @collection, @request) do
-            @collection_adapter.filter
+            @collection_adapter.filter(@collection)
           end
         end
       end
@@ -42,9 +53,11 @@ module RDataTables
           call_overridden_or_block(__method__, @collection, @request) do
             next @collection if @request.sorting_columns.empty?
 
-            sorting_columns.each do |column, direction|
-              sort_by(column, direction)
+            @request.sorting_columns.each do |column, direction|
+              @collection = sort_by(column, direction)
             end
+
+            @collection
           end
         end  
       end
@@ -52,8 +65,8 @@ module RDataTables
       def sort_by(column, direction)
         @collection = begin
           call_overridden_or_block(__method__, @collection, column, direction) do
-            call_overridden_or_block("sort_by_#{column}", @collection, column, direction) do
-              @collection_adapter.sort_by(column, direction)
+            call_overridden_or_block("sort_by_#{column}", @collection, direction) do
+              @collection_adapter.sort_by(@collection, column, direction)
             end
           end
         end

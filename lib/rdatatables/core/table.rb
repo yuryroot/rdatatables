@@ -23,6 +23,8 @@ module RDataTables
         end
       end
 
+      attr_reader :context
+
       def initialize(*args)
         initialize_table(*args)
       end
@@ -31,6 +33,11 @@ module RDataTables
         @request = Request.new(table: self, params: request_params)
         @processor = Processor.new(table: self, collection: collection, request: @request)
         @context = context
+      end
+
+      def response_hash
+        @processor.process
+        @processor.data_hash
       end
     end
   end
