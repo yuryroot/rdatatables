@@ -29,10 +29,8 @@ module RDataTables
 
       def initialize_table(collection:, request_params: {}, context: nil)
         @request = Request.new(table: self, params: request_params)
+        @processor = Processor.new(table: self, collection: collection, request: @request)
         @context = context
-
-        collection_adapter = Collections.adapter_for(collection)
-        @collection = collection_adapter.new(table: self, collection: collection, request: @request)
       end
     end
   end

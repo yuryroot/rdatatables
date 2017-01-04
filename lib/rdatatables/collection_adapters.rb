@@ -1,9 +1,9 @@
 %w(active_record).each do |adapter|
-  require_relative "collections/#{adapter}"
+  require_relative "collection_adapters/#{adapter}"
 end
 
 module RDataTables
-  module Collections
+  module CollectionAdapters
     ADAPTERS = [ActiveRecord].freeze
 
     def self.adapter_for(collection)

@@ -1,4 +1,4 @@
-%w(table request collection exceptions).each do |script|
+%w(exceptions table request processor collection_adapter).each do |script|
   require_relative "core/#{script}"
 end
 
