@@ -1,10 +1,10 @@
-%w(active_record).each do |adapter|
+%w(active_record enumerable).each do |adapter|
   require_relative "collection_adapters/#{adapter}"
 end
 
 module RDataTables
   module CollectionAdapters
-    ADAPTERS = [ActiveRecord].freeze
+    ADAPTERS = [ActiveRecord, Enumerable].freeze
 
     def self.adapter_for(collection)
       adapter = ADAPTERS.find { |adapter| adapter.processable?(collection) }
