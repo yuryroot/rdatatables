@@ -17,7 +17,7 @@ module RDataTables
 
       def data_hash
         {
-          sEcho:                @request.echo,
+          sEcho:                @request.meta.echo,
           # TODO: Set total & total display counters to correct values
           #       #filter method must also be implemented.
           iTotalRecords:        @collection.count,
@@ -42,6 +42,7 @@ module RDataTables
 
       def filter
         @collection = begin
+          # TODO: pass @request.search/filter
           call_overridden_or_block(__method__, @collection, @request) do
             @collection_adapter.filter(@collection)
           end
@@ -50,11 +51,11 @@ module RDataTables
 
       def sort
         @collection = begin
-          call_overridden_or_block(__method__, @collection, @request) do
-            next @collection if @request.sorting_columns.empty?
+          call_overridden_or_block(__method__, @collection, @request.sorting) do
+            next @collection if @request.sorting.columns.empty?
 
-            @request.sorting_columns.each do |column, direction|
-              @collection = sort_by(column, direction)
+            @request.sorting.columns.each do |column_order|
+              @collection = sort_by(column_order)
             end
 
             @collection
@@ -62,11 +63,11 @@ module RDataTables
         end  
       end
 
-      def sort_by(column, direction)
+      def sort_by(column_order)
         @collection = begin
-          call_overridden_or_block(__method__, @collection, column, direction) do
-            call_overridden_or_block("sort_by_#{column}", @collection, direction) do
-              @collection_adapter.sort_by(@collection, column, direction)
+          call_overridden_or_block(__method__, @collection, column_order) do
+            call_overridden_or_block("sort_by_#{column_order.column}", @collection, column_order.direction) do
+              @collection_adapter.sort_by(@collection, column_order)
             end
           end
         end
@@ -74,9 +75,8 @@ module RDataTables
 
       def paginate
         @collection = begin
-          call_overridden_or_block(__method__, @collection, @request) do
-            start_from, per_page = @request.pagination_info.values_at(:start_from, :per_page)
-            @collection_adapter.paginate(@collection, start_from, per_page)
+          call_overridden_or_block(__method__, @collection, @request.page) do
+            @collection_adapter.paginate(@collection, @request.page)
           end
         end
       end

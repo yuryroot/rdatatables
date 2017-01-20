@@ -15,11 +15,11 @@ module RDataTables
           collection
         end
 
-        def sort_by(collection, column, direction)
+        def sort_by(collection, column_order)
           collection
         end
 
-        def paginate(collection, start_from, per_page)
+        def paginate(collection, page)
           collection
         end
       end

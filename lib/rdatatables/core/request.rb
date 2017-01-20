@@ -1,36 +1,18 @@
+%w(meta page sorting column_order).each do |entity|
+  require_relative "request/#{entity}"
+end
+
 module RDataTables
   module Core
     class Request
-      
+      attr_reader :meta
+      attr_reader :page
+      attr_reader :sorting
+
       def initialize(table:, params:)
-        @table = table
-        @params = params
-      end
-
-      def echo
-        @params['sEcho'].to_i
-      end
-
-      def pagination_info
-        @pagination_info ||= {}.tap do |info|
-          info[:start_from] = @params['iDisplayStart'].to_i
-          info[:per_page]   = @params['iDisplayLength'].to_i
-          info[:page]       = info[:start_from] / info[:per_page] + 1
-        end
-      end
-
-      # [[<column>, <direction>], [...], ...]
-      def sorting_columns
-        @sorting_columns ||= [].tap do |order|
-          if @params['iSortingCols'].to_i >= 1
-            @params['iSortingCols'].to_i.times.each do |index|
-              column_index  = @params["iSortCol_#{index}"].to_i
-              direction     = @params["sSortDir_#{index}"]
-              column        = @table.class.columns.keys[column_index]
-              order << [column, direction]
-            end
-          end
-        end
+        @meta    = Meta.new(params: params)
+        @page    = Page.new(params: params)
+        @sorting = Sorting.new(params: params, table: table)
       end
     end
   end

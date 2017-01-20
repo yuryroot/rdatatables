@@ -7,12 +7,12 @@ module RDataTables
           defined?(::ActiveRecord) && collection.is_a?(::ActiveRecord::Relation)
         end
 
-        def sort_by(collection, column, direction)
-          collection.order(column => direction)
+        def sort_by(collection, column_order)
+          collection.order(column_order.column => column_order.direction)
         end
 
-        def paginate(collection, start_from, per_page)
-          collection.offset(start_from).limit(per_page)
+        def paginate(collection, page)
+          collection.offset(page.start_from).limit(page.per_page)
         end
       end
     end
