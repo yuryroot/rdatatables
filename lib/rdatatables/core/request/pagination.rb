@@ -1,7 +1,7 @@
 module RDataTables
   module Core
     class Request
-      class Page
+      class Pagination
         attr_reader :start_from
         attr_reader :per_page
         attr_reader :page

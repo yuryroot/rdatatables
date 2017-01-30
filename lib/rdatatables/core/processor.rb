@@ -31,22 +31,25 @@ module RDataTables
       end
 
       def data_row(object)
-        @table.class.columns.keys.map { |column| data_cell(object, column) }
+        @table.class.columns.map { |column| data_cell(object, column) }
       end
 
       def data_cell(object, column)
-        call_overridden_or_block(column, object) do
+        call_overridden_or_block(column.name, object) do
           @collection_adapter.data_cell(object, column)
         end
       end
 
       def filter
-        @collection = begin
-          # TODO: pass @request.search/filter
-          call_overridden_or_block(__method__, @collection, @request) do
-            @collection_adapter.filter(@collection)
-          end
-        end
+        # TODO: Implement global filter
+        # @collection = begin
+        #   # TODO: pass @request.search/filter
+        #   call_overridden_or_block(__method__, @collection, @request) do
+        #     @collection_adapter.filter(@collection)
+        #   end
+        # end
+
+        @collection
       end
 
       def sort
@@ -60,13 +63,13 @@ module RDataTables
 
             @collection
           end
-        end  
+        end
       end
 
       def sort_by(column_order)
         @collection = begin
           call_overridden_or_block(__method__, @collection, column_order) do
-            call_overridden_or_block("sort_by_#{column_order.column}", @collection, column_order.direction) do
+            call_overridden_or_block("sort_by_#{column_order.column.name}", @collection, column_order.direction) do
               @collection_adapter.sort_by(@collection, column_order)
             end
           end
@@ -75,8 +78,8 @@ module RDataTables
 
       def paginate
         @collection = begin
-          call_overridden_or_block(__method__, @collection, @request.page) do
-            @collection_adapter.paginate(@collection, @request.page)
+          call_overridden_or_block(__method__, @collection, @request.pagination) do
+            @collection_adapter.paginate(@collection, @request.pagination)
           end
         end
       end

@@ -8,11 +8,11 @@ module RDataTables
         end
 
         def sort_by(collection, column_order)
-          collection.order(column_order.column => column_order.direction)
+          collection.order(column_order.column.name => column_order.direction)
         end
 
-        def paginate(collection, page)
-          collection.offset(page.start_from).limit(page.per_page)
+        def paginate(collection, pagination)
+          collection.offset(pagination.start_from).limit(pagination.per_page)
         end
       end
     end

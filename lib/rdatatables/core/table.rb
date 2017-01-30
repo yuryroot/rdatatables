@@ -1,3 +1,5 @@
+require_relative 'table/column'
+
 module RDataTables
   module Core
     module Table
@@ -10,16 +12,18 @@ module RDataTables
           if class_variable_defined?(:@@columns)
             class_variable_get(:@@columns)
           else
-            class_variable_set(:@@columns, {})
+            class_variable_set(:@@columns, [])
           end
         end
 
         def column(name, options = {})
-          if columns.key?(name)
-            raise(RDataTables::DuplicateColumn, name)
-          end
+          column = Column.new(name, options)
 
-          columns[name] = options
+          if columns.include?(column)
+            raise(RDataTables::DuplicateColumn, name)
+          else
+            columns << column
+          end
         end
       end
 
@@ -41,4 +45,4 @@ module RDataTables
       end
     end
   end
-end  
+end
