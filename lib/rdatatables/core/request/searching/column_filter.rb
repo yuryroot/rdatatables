@@ -2,15 +2,13 @@ module RDataTables
   module Core
     class Request
       class Searching
-        class Filter
+        class ColumnFilter
           attr_reader :column
           attr_reader :search
           attr_reader :regexp
           attr_reader :searchable
 
-          # TODO: Define separate class for global filter.
-          #       For now "column" can be nil for global search field.
-          def initialize(column: nil, search:, regexp:, searchable:)
+          def initialize(column:, search:, regexp:, searchable:)
             @column = column
             @search = search
             @regexp = regexp

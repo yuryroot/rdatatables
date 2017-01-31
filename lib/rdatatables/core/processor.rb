@@ -41,9 +41,11 @@ module RDataTables
       end
 
       def filter
-        # TODO: Implement global filter
+        # TODO: Handle:
+        #   * All columns filters.
+        #   * Handle global filter.
+
         # @collection = begin
-        #   # TODO: pass @request.search/filter
         #   call_overridden_or_block(__method__, @collection, @request) do
         #     @collection_adapter.filter(@collection)
         #   end
