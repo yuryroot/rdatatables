@@ -11,11 +11,15 @@ module RDataTables
           object.public_send(column.name)
         end
 
-        def filter(collection, searching)
+        def global_filter(collection, global_filter)
           collection
         end
 
-        def sort_by(collection, sorting)
+        def filter_by(collection, column_filter)
+          collection
+        end
+
+        def sort_by(collection, column_order)
           collection
         end
 

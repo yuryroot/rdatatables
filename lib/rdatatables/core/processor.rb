@@ -18,10 +18,8 @@ module RDataTables
       def data_hash
         {
           sEcho:                @request.meta.echo,
-          # TODO: Set total & total display counters to correct values
-          #       #filter method must also be implemented.
-          iTotalRecords:        @collection.count,
-          iTotalDisplayRecords: @collection.count,
+          iTotalRecords:        @collection.count,  # TODO: Implement filtration
+          iTotalDisplayRecords: @collection.count,  # TODO: Implement filtration
           aaData:               data_rows
         }
       end
@@ -41,24 +39,40 @@ module RDataTables
       end
 
       def filter
-        # TODO: Handle:
-        #   * All columns filters.
-        #   * Handle global filter.
+        @collection = begin
+          call_overridden_or_block(__method__, @collection, @request.searching) do
+            if @request.searching.global_filter
+              call_overridden_or_block('global_filter', @collection,
+                                        @request.searching.global_filter.search,
+                                        @request.searching.global_filter.regexp) do
+                @collection = @collection_adapter.global_filter(@collection, @request.searching.global_filter)
+              end
+            end
 
-        # @collection = begin
-        #   call_overridden_or_block(__method__, @collection, @request) do
-        #     @collection_adapter.filter(@collection)
-        #   end
-        # end
+            @request.searching.filters.each do |column_filter|
+              @collection = filter_by(column_filter)
+            end
 
-        @collection
+            @collection
+          end
+        end
+      end
+
+      # TODO: check searchable parameter
+      def filter_by(column_filter)
+        @collection = begin # TODO: Doesn't this assignment make sense?
+          call_overridden_or_block(__method__, @collection, column_filter) do
+            call_overridden_or_block("filter_by_#{column_filter.column.name}", @collection,
+                                     column_filter.search, column_filter.regexp) do
+              @collection_adapter.filter_by(@collection, column_filter)
+            end
+          end
+        end
       end
 
       def sort
         @collection = begin
           call_overridden_or_block(__method__, @collection, @request.sorting) do
-            next @collection if @request.sorting.columns.empty?
-
             @request.sorting.columns.each do |column_order|
               @collection = sort_by(column_order)
             end
@@ -68,10 +82,12 @@ module RDataTables
         end
       end
 
+      # TODO: check sortable parameter
       def sort_by(column_order)
-        @collection = begin
+        @collection = begin # TODO: Doesn't this assignment make sense?
           call_overridden_or_block(__method__, @collection, column_order) do
-            call_overridden_or_block("sort_by_#{column_order.column.name}", @collection, column_order.direction) do
+            call_overridden_or_block("sort_by_#{column_order.column.name}", @collection,
+                                     column_order.direction) do
               @collection_adapter.sort_by(@collection, column_order)
             end
           end
