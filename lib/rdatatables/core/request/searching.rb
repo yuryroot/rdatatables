@@ -11,7 +11,7 @@ module RDataTables
 
           table.class.columns.each_with_index do |column, index|
             search_string = params["sSearch_#{index}"]
-            next if search_string.length == 0
+            next if search_string.nil? || search_string.length == 0
 
             regexp     = params.fetch("bRegex_#{index}") == 'true'
             searchable = params.fetch("bSearchable_#{index}") == 'true'
@@ -21,7 +21,7 @@ module RDataTables
           end
 
           global_search_string = params['sSearch']
-          if global_search_string.length > 0
+          if global_search_string && global_search_string.length > 0
             regexp = params.fetch('bRegex') == 'true'
             @global_filter = GlobalFilter.new(search: global_search_string, regexp: regexp)
           end

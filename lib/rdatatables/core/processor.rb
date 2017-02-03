@@ -1,12 +1,13 @@
 module RDataTables
   module Core
     class Processor
-      
-      def initialize(table:, collection:, request:)
+
+      def initialize(table:, collection:, request:, options: {})
         @table = table
         @collection = collection
         @collection_adapter = CollectionAdapters.adapter_for(collection)
         @request = request
+        @total_count = options[:total_count] || @collection.count
       end
 
       def process
@@ -18,8 +19,8 @@ module RDataTables
       def data_hash
         {
           sEcho:                @request.meta.echo,
-          iTotalRecords:        @collection.count,  # TODO: Implement filtration
-          iTotalDisplayRecords: @collection.count,  # TODO: Implement filtration
+          iTotalRecords:        @total_count,
+          iTotalDisplayRecords: @collection.count,
           aaData:               data_rows
         }
       end
@@ -42,14 +43,11 @@ module RDataTables
         @collection = begin
           call_overridden_or_block(__method__, @collection, @request.searching) do
             if @request.searching.global_filter
-              call_overridden_or_block('global_filter', @collection,
-                                        @request.searching.global_filter.search,
-                                        @request.searching.global_filter.regexp) do
-                @collection = @collection_adapter.global_filter(@collection, @request.searching.global_filter)
-              end
+              @collection = global_filter
             end
 
             @request.searching.filters.each do |column_filter|
+              next unless column_filter.searchable
               @collection = filter_by(column_filter)
             end
 
@@ -58,14 +56,19 @@ module RDataTables
         end
       end
 
-      # TODO: check searchable parameter
+      def global_filter
+        call_overridden_or_block(__method__, @collection,
+                                 @request.searching.global_filter.search,
+                                 @request.searching.global_filter.regexp) do
+          @collection_adapter.global_filter(@collection, @request.searching.global_filter)
+        end
+      end
+
       def filter_by(column_filter)
-        @collection = begin # TODO: Doesn't this assignment make sense?
-          call_overridden_or_block(__method__, @collection, column_filter) do
-            call_overridden_or_block("filter_by_#{column_filter.column.name}", @collection,
-                                     column_filter.search, column_filter.regexp) do
-              @collection_adapter.filter_by(@collection, column_filter)
-            end
+        call_overridden_or_block(__method__, @collection, column_filter) do
+          call_overridden_or_block("filter_by_#{column_filter.column.name}", @collection,
+                                   column_filter.search, column_filter.regexp) do
+            @collection_adapter.filter_by(@collection, column_filter)
           end
         end
       end
@@ -74,6 +77,7 @@ module RDataTables
         @collection = begin
           call_overridden_or_block(__method__, @collection, @request.sorting) do
             @request.sorting.columns.each do |column_order|
+              next unless column_order.sortable
               @collection = sort_by(column_order)
             end
 
@@ -82,14 +86,11 @@ module RDataTables
         end
       end
 
-      # TODO: check sortable parameter
       def sort_by(column_order)
-        @collection = begin # TODO: Doesn't this assignment make sense?
-          call_overridden_or_block(__method__, @collection, column_order) do
-            call_overridden_or_block("sort_by_#{column_order.column.name}", @collection,
-                                     column_order.direction) do
-              @collection_adapter.sort_by(@collection, column_order)
-            end
+        call_overridden_or_block(__method__, @collection, column_order) do
+          call_overridden_or_block("sort_by_#{column_order.column.name}", @collection,
+                                   column_order.direction) do
+            @collection_adapter.sort_by(@collection, column_order)
           end
         end
       end
