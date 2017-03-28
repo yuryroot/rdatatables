@@ -4,7 +4,7 @@ module RDataTables
       class Searching
         class GlobalFilter
           attr_reader :search
-          attr_reader :regexp # TODO: regexp attribute isn't supported yet
+          attr_reader :regexp
 
           def initialize(search:, regexp:)
             @search = search

@@ -11,7 +11,6 @@ module RDataTables
       end
 
       def process
-        filter
         sort
         paginate
       end
@@ -36,40 +35,6 @@ module RDataTables
       def data_cell(object, column)
         call_overridden_or_block(column.name, object) do
           @collection_adapter.data_cell(object, column)
-        end
-      end
-
-      def filter
-        @collection = begin
-          call_overridden_or_block(__method__, @collection, @request.searching) do
-            if @request.searching.global_filter
-              @collection = global_filter
-            end
-
-            @request.searching.filters.each do |column_filter|
-              next unless column_filter.searchable
-              @collection = filter_by(column_filter)
-            end
-
-            @collection
-          end
-        end
-      end
-
-      def global_filter
-        call_overridden_or_block(__method__, @collection,
-                                 @request.searching.global_filter.search,
-                                 @request.searching.global_filter.regexp) do
-          @collection_adapter.global_filter(@collection, @request.searching.global_filter)
-        end
-      end
-
-      def filter_by(column_filter)
-        call_overridden_or_block(__method__, @collection, column_filter) do
-          call_overridden_or_block("filter_by_#{column_filter.column.name}", @collection,
-                                   column_filter.search, column_filter.regexp) do
-            @collection_adapter.filter_by(@collection, column_filter)
-          end
         end
       end
 
