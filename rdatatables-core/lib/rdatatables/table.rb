@@ -19,6 +19,12 @@ module RDataTables
           columns << column
         end
       end
+
+      def inherited(child)
+        columns.each do |parent_column|
+          child.column(parent_column.name, parent_column.options)
+        end
+      end
     end
   end
 end
