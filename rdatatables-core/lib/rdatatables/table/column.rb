@@ -7,7 +7,7 @@ module RDataTables
       DEFAULT_OPTIONS = { sortable: true, searchable: true }
 
       def initialize(column, options = {})
-        @name = column.to_s
+        @name = column.to_sym
         @options = DEFAULT_OPTIONS.merge(symbolize_keys(options))
       end
 
