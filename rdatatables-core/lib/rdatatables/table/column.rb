@@ -8,7 +8,7 @@ module RDataTables
 
       def initialize(column, options = {})
         @name = column.to_sym
-        @options = DEFAULT_OPTIONS.merge(symbolize_keys(options))
+        @options = DEFAULT_OPTIONS.merge(Helpers.symbolize_keys(options))
       end
 
       def sortable?
@@ -21,12 +21,6 @@ module RDataTables
 
       def == (other)
         @name == other.name
-      end
-
-      private
-
-      def symbolize_keys(options)
-        options.map { |option, value| [option.to_sym, value] }.to_h
       end
     end
   end

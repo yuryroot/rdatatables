@@ -17,9 +17,9 @@ RSpec.describe 'table definition' do
     end
 
     it 'prevents duplicate columns' do
-      table.column :first_column
+      table.column :some_column
 
-      expect { table.column :first_column }.to raise_error(/Column 'first_column' already exists/)
+      expect { table.column :some_column }.to raise_error(/Column 'some_column' already exists/)
     end
   end
 

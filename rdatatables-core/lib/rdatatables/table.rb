@@ -11,13 +11,18 @@ module RDataTables
       end
 
       def column(name, options = {})
-        column = Column.new(name, options)
+        options = Helpers.symbolize_keys(options)
+        columns_manager = ColumnsManager.new(self)
 
-        if columns.include?(column)
-          raise "Column '#{column.name}' already exists"
-        else
-          columns << column
+        [:before, :after, :instead_of].each do |insert_position|
+          target_column = options.delete(insert_position)
+
+          if target_column
+            return columns_manager.public_send(insert_position, target_column, name, options)
+          end
         end
+
+        columns_manager.append(name, options)
       end
 
       def inherited(child)
