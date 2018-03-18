@@ -9,11 +9,38 @@ RSpec.describe 'table definition' do
       expect(table.columns).to be_empty
     end
 
-    it 'defines new columns' do
+    it 'appends new columns' do
       table.column :first_column
       table.column :second_column
 
       expect(table.columns.map(&:name)).to eq([:first_column, :second_column])
+    end
+
+    it 'appends :before other' do
+      table.column :first_column
+      table.column :second_column
+
+      expect(table.columns.map(&:name)).to eq([:first_column, :second_column])
+      table.column :before_second_column, before: :second_column
+      expect(table.columns.map(&:name)).to eq([:first_column, :before_second_column, :second_column])
+    end
+
+    it 'appends :after other' do
+      table.column :first_column
+      table.column :second_column
+
+      expect(table.columns.map(&:name)).to eq([:first_column, :second_column])
+      table.column :after_first_column, after: :first_column
+      expect(table.columns.map(&:name)).to eq([:first_column, :after_first_column, :second_column])
+    end
+
+    it 'appends :instead_of other' do
+      table.column :first_column
+      table.column :second_column
+
+      expect(table.columns.map(&:name)).to eq([:first_column, :second_column])
+      table.column :replaced_second_column, instead_of: :second_column
+      expect(table.columns.map(&:name)).to eq([:first_column, :replaced_second_column])
     end
 
     it 'prevents duplicate columns' do
