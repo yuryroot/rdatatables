@@ -4,7 +4,12 @@ module RDataTables
       attr_reader :name
       attr_reader :options
 
-      DEFAULT_OPTIONS = { sortable: true, searchable: true }
+      DEFAULT_OPTIONS = {
+        sortable: true,
+        searchable: true,
+        if_func: nil,
+        unless_func: nil
+      }.freeze
 
       def initialize(column, options = {})
         @name = column.to_sym

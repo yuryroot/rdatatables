@@ -31,5 +31,9 @@ module RDataTables
         end
       end
     end
+
+    def columns
+      ColumnsFilter.new(self).filter
+    end
   end
 end

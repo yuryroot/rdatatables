@@ -75,4 +75,40 @@ RSpec.describe 'table definition' do
       expect(parent_table.columns).to be_empty
     end
   end
+
+  context 'instance columns' do
+    let(:table) do
+      Class.new(RDataTables::Table)
+    end
+
+    it 'same with class columns by default' do
+      table.column :first_column
+      table.column :second_column
+
+      expect(table.columns.map(&:name)).to eq([:first_column, :second_column])
+      expect(table.new.columns.map(&:name)).to eq([:first_column, :second_column])
+    end
+
+    it "option :if_func works" do
+      table.column :first_column, if_func: -> { true }
+      table.column :second_column, if_func: -> { false }
+
+      expect(table.new.columns.map(&:name)).to eq([:first_column])
+    end
+
+    it "option :unless_func works" do
+      table.column :first_column, unless_func: -> { false }
+      table.column :second_column, unless_func: -> { true }
+
+      expect(table.new.columns.map(&:name)).to eq([:first_column])
+    end
+
+    it "both :if_func and :unless_func work together" do
+      table.column :first_column, if_func: -> { true }, unless_func: -> { false }
+      table.column :second_column, if_func: -> { false }, unless_func: -> { false }
+      table.column :third_column, if_func: -> { true }, unless_func: -> { true }
+
+      expect(table.new.columns.map(&:name)).to eq([:first_column])
+    end
+  end
 end
