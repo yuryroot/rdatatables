@@ -35,5 +35,9 @@ module RDataTables
     def columns
       ColumnsFilter.new(self).filter
     end
+
+    def build_header_html(&block)
+      HtmlBuilder.new(self).build_header(&block)
+    end
   end
 end
