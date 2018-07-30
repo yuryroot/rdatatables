@@ -37,7 +37,7 @@ module RDataTables
     end
 
     def build_header_html(&block)
-      HtmlBuilder.new(self).build_header(&block)
+      HtmlHeaderBuilder.new(self).build_header(&block)
     end
   end
 end
