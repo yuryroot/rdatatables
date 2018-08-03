@@ -12,7 +12,7 @@ module RDataTables
         @data[name] = {
           column: object,
           attributes: build_attributes_for(object),
-          content: ''
+          content: name.to_s
         }
       end
 
@@ -41,8 +41,8 @@ module RDataTables
 
       def build_attributes_for(column)
         data = {
-          sort:   column.sortable?,
-          search: column.searchable?
+          sortable:   column.sortable?,
+          searchable: column.searchable?
         }
 
         { data: data }

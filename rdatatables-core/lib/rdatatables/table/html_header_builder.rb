@@ -44,7 +44,7 @@ module RDataTables
               end
 
               content = data.fetch(:content)
-              html.td(attributes) { |tag| tag << content }
+              html.th(attributes) { |tag| tag << content }
             end
           end
         end
